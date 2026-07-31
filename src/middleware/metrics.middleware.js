@@ -1,4 +1,9 @@
-const { httpRequestsTotal,activeRequests,failedRequestsTotal } = require("../config/metrics");
+const { 
+    httpRequestsTotal,
+    activeRequests,
+    failedRequestsTotal,
+    httpRequestDurationSeconds
+} = require("../config/metrics");
 
 const metricsMiddleware = (req, res, next) => {
 
@@ -6,28 +11,35 @@ const metricsMiddleware = (req, res, next) => {
     return next();
   } 
   activeRequests.inc();
-  
 
-  res.on("finish", () => {
-    activeRequests.dec();
-    httpRequestsTotal.inc({
-      method: req.method,
-      route: req.route?.path || req.path,
-      status_code: res.statusCode,
-    });
+  const endTimer = httpRequestDurationSeconds.startTimer();
 
-    if (res.statusCode >= 400) {
-      console.log("Failed request:", res.statusCode);
+res.on("finish", () => {
+  activeRequests.dec();
 
-  failedRequestsTotal.inc({
+  httpRequestsTotal.inc({
     method: req.method,
     route: req.route?.path || req.path,
     status_code: String(res.statusCode),
   });
-} 
-  });
 
-  next();
+  if (res.statusCode >= 400) {
+
+    failedRequestsTotal.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status_code: String(res.statusCode),
+    });
+  }
+
+  endTimer({
+    method: req.method,
+    route: req.route?.path || req.path,
+    status_code: String(res.statusCode),
+  });
+});
+
+next();
 };
 
 module.exports = metricsMiddleware;
