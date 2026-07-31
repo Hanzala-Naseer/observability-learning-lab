@@ -7,12 +7,18 @@ const httpRequestsTotal = new client.Counter({
   help: "Total number of HTTP requests",
   labelNames: ["method", "route", "status_code"],
 });
-//active requests
+
 const activeRequests = new client.Gauge({
   name: "active_requests",
   help: "Number of active HTTP requests",
 });
 
+
+const failedRequestsTotal = new client.Counter({
+  name: "failed_requests_total",
+  help: "Total number of failed HTTP requests",
+  labelNames: ["method", "route", "status_code"],
+});
 
 
 
@@ -29,5 +35,6 @@ module.exports = {
     httpRequestsTotal,
     activeRequests,
     memoryUsageBytes,
-    memoryUsageBytes
+    memoryUsageBytes,
+    failedRequestsTotal
 };
