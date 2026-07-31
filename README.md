@@ -38,8 +38,6 @@ The Grafana dashboard provides operational visibility into the application's hea
 
 ## Full Dashboard
 
-> Replace this placeholder with your complete dashboard screenshot.
-
 ![Dashboard Overview](./screenshots/dashboard-overview.PNG)
 
 ---
@@ -50,7 +48,6 @@ The Grafana dashboard provides operational visibility into the application's hea
 
 Monitor incoming HTTP traffic over time to understand application load.
 
-> Replace this placeholder with the Request Rate panel screenshot.
 
 ![Request Rate](./screenshots/panel-1-request-rate.PNG)
 
@@ -68,8 +65,6 @@ Features:
 - Designed to quickly identify spikes in server failures
 - Uses PromQL to calculate error percentage
 
-> Replace this placeholder with the 5xx Error Rate panel screenshot.
-
 ![HTTP 5xx Error Rate](./screenshots/panel-2-5xx-error-rate.PNG)
 
 ---
@@ -85,7 +80,6 @@ Features:
 - Real-time concurrency tracking
 - Custom Gauge metric
 
-> Replace this placeholder with the Active Requests panel screenshot.
 
 ![Active Requests](./screenshots/panel-3-active-requests.PNG)
 
@@ -101,8 +95,6 @@ Features:
 
 - Uses default Node.js runtime metrics
 - Displays heap usage in MiB
-
-> Replace this placeholder with the Heap Memory Usage panel screenshot.
 
 ![Heap Memory Usage](./screenshots/panel-4-memory-usage.PNG)
 
