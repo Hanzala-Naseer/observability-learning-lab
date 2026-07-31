@@ -1,157 +1,250 @@
 # Observability Learning Lab
 
-A practical learning repository focused on understanding modern application observability using **Prometheus** and **Grafana**.
+A hands-on observability project built with **Node.js**, **Express.js**, **Prometheus**, and **Grafana** to explore modern application monitoring and metrics collection.
 
-This project is not built by simply following tutorials. Instead, each observability concept is explored, implemented, tested, and documented through a real **Node.js + Express.js** application.
+This project demonstrates how to instrument a Node.js application, expose application metrics, collect them using Prometheus, analyze them with PromQL, and visualize operational insights through production-inspired Grafana dashboards.
 
-The goal is to understand how monitoring systems work internally — from exposing application metrics, designing meaningful measurements, querying data with PromQL, and eventually building production-style dashboards.
-
-The concepts learned in this project will later be applied to **PulseOps**, an API monitoring platform.
+The implementation focuses on understanding the fundamentals of observability and building a strong foundation for larger monitoring systems such as **PulseOps**, an API Health Monitoring Platform.
 
 ---
 
-# Project Goals
+# Features
 
-The main objective of this repository is to build a strong foundation in observability by implementing core monitoring concepts in practice.
-
-The project covers:
-
-- Observability fundamentals
-- Prometheus architecture
-- Metrics collection and instrumentation
-- Metric types and use cases
-- Labels and time-series design
+- Prometheus integration
+- Metrics endpoint (`/metrics`)
+- Default Node.js runtime metrics
+- Custom Counter, Gauge, and Histogram metrics
 - PromQL querying
-- Grafana visualization
-- Monitoring best practices
+- Grafana dashboard development
+- Production-inspired monitoring panels
+- Documentation for every implementation phase
 
 ---
 
 # Tech Stack
 
-- **Node.js**
-- **Express.js**
-- **Prometheus**
-- **prom-client**
-- **Grafana**
-- **Git & GitHub**
+- Node.js
+- Express.js
+- Prometheus
+- prom-client
+- Grafana
+- Git & GitHub
 
 ---
 
-# Implemented Features
+# Dashboard Overview
 
-## Prometheus Integration
+The Grafana dashboard provides operational visibility into the application's health through four monitoring panels.
 
-Implemented the foundation required for application monitoring:
+## Full Dashboard
 
-- Configured Prometheus locally
-- Created a metrics endpoint
-- Connected Prometheus with the application
-- Configured metric scraping
-- Enabled default Node.js runtime metrics
+> Replace this placeholder with your complete dashboard screenshot.
+
+![Dashboard Overview](./screenshots/dashboard-overview.PNG)
 
 ---
 
-## Application Metrics
+## Request Rate
 
-Implemented custom metrics to understand different monitoring scenarios.
+**Purpose**
 
-### Counter Metrics
+Monitor incoming HTTP traffic over time to understand application load.
 
-Used for values that continuously increase.
+> Replace this placeholder with the Request Rate panel screenshot.
 
-Implemented:
+![Request Rate](./screenshots/panel-1-request-rate.PNG)
 
-```
-http_requests_total
-```
+---
+
+## HTTP 5xx Error Rate
+
+**Purpose**
+
+Monitor the percentage of server-side errors.
+
+Features:
+
+- Visual threshold at **5%**
+- Designed to quickly identify spikes in server failures
+- Uses PromQL to calculate error percentage
+
+> Replace this placeholder with the 5xx Error Rate panel screenshot.
+
+![HTTP 5xx Error Rate](./screenshots/panel-2-5xx-error-rate.PNG)
+
+---
+
+## Active Requests
+
+**Purpose**
+
+Monitor the number of requests currently being processed by the application.
+
+Features:
+
+- Real-time concurrency tracking
+- Custom Gauge metric
+
+> Replace this placeholder with the Active Requests panel screenshot.
+
+![Active Requests](./screenshots/panel-3-active-requests.PNG)
+
+---
+
+## Heap Memory Usage
+
+**Purpose**
+
+Monitor Node.js heap memory usage to observe application memory behavior.
+
+Features:
+
+- Uses default Node.js runtime metrics
+- Displays heap usage in MiB
+
+> Replace this placeholder with the Heap Memory Usage panel screenshot.
+
+![Heap Memory Usage](./screenshots/panel-4-memory-usage.PNG)
+
+---
+
+# Metrics Implemented
+
+## Counter
+
+### http_requests_total
 
 Tracks the total number of HTTP requests received by the application.
 
----
+Used for:
 
-### Gauge Metrics
-
-Used for values that represent the current state of a system.
-
-Implemented:
-
-```
-active_requests
-nodejs_memory_usage_bytes
-```
-
-Used for monitoring:
-
-- Active requests currently being processed
-- Current application memory usage
+- Request counting
+- Request rate calculations
+- Error rate calculations
 
 ---
 
-### Histogram Metrics
+## Gauge
 
-Used for measuring distributions such as request duration.
+Implemented custom Gauge metrics.
 
-Implemented:
+### active_requests
 
-```
-http_request_duration_seconds
-```
+Tracks the number of requests currently being processed.
 
-Tracks:
+Used for:
 
-- Request latency
-- Response time distribution
-- Performance trends
+- Concurrent request monitoring
+- Server load visualization
+
+---
+
+## Histogram
+
+### http_request_duration_seconds
+
+Measures request latency.
+
+Used for:
+
+- Response time analysis
+- Latency distribution
+- Performance monitoring
+
+---
+
+## Default Runtime Metrics
+
+Collected automatically through **prom-client**.
+
+Examples include:
+
+- Heap memory usage
+- Process memory
+- Event loop statistics
+- Garbage collection metrics
+- CPU usage
 
 ---
 
 # Labels & Time Series
 
-Implemented metric labels to create meaningful dimensions for analysis.
+Metrics are enriched using labels to create meaningful dimensions.
 
-Current labels:
+Implemented labels:
 
-```
+```text
 method
 route
 status_code
 ```
 
-These allow metrics to be filtered and analyzed based on:
+These labels allow filtering and aggregation by:
 
-- HTTP methods
-- API routes
-- Response status codes
+- HTTP Method
+- API Route
+- HTTP Status Code
 
-Also explored the importance of avoiding unnecessary high-cardinality labels.
+The project also explores why avoiding unnecessary high-cardinality labels is important for Prometheus performance.
 
 ---
 
-# PromQL Practice
+# PromQL Examples
 
-Learned how to query and analyze metrics using PromQL.
-
-Practiced:
+### Request Rate
 
 ```promql
-rate()
-increase()
-sum()
+sum(rate(http_requests_total[5m]))
 ```
 
-Used PromQL to answer practical monitoring questions:
+---
 
-- How many requests is the API receiving?
-- Which endpoints are used the most?
-- How many requests happened within a specific period?
-- What is the current request rate?
+### HTTP 5xx Error Rate
+
+```promql
+(
+  sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+  /
+  sum(rate(http_requests_total[5m]))
+) * 100
+```
+
+---
+
+### Active Requests
+
+```promql
+active_requests
+```
+
+---
+
+### Heap Memory Usage
+
+```promql
+nodejs_heap_size_used_bytes / 1024 / 1024
+```
+
+---
+
+# Dashboard Panels
+
+The Grafana dashboard currently includes:
+
+| Panel | Description |
+|--------|-------------|
+| Request Rate | Monitors incoming traffic over time |
+| HTTP 5xx Error Rate | Displays the percentage of server-side failures |
+| Active Requests | Tracks concurrent request processing |
+| Heap Memory Usage | Monitors Node.js heap memory consumption |
+
+Each panel is designed to answer an operational question rather than simply visualize raw metrics.
 
 ---
 
 # Repository Structure
 
-```
+```text
 observability-learning-lab/
 │
 ├── docs/
@@ -166,9 +259,13 @@ observability-learning-lab/
 │   └── prometheus.yml
 │
 ├── screenshots/
+│   ├── dashboard-overview.png
+│   ├── panel-1-request-rate.png
+│   ├── panel-2-5xx-error-rate.png
+│   ├── panel-3-active-requests.png
+│   └── panel-4-memory-usage.png
 │
 ├── src/
-│   │
 │   ├── config/
 │   │   └── metrics.js
 │   │
@@ -191,104 +288,101 @@ observability-learning-lab/
 
 ---
 
-# Learning Progress
+# Project Progress
 
-| Topic | Status |
-|---|---|
-| Repository Setup | ✅ Completed |
-| Express Application Setup | ✅ Completed |
+| Feature | Status |
+|----------|--------|
+| Express Application | ✅ Completed |
 | Prometheus Integration | ✅ Completed |
 | Metrics Endpoint | ✅ Completed |
 | Counter Metrics | ✅ Completed |
 | Gauge Metrics | ✅ Completed |
 | Histogram Metrics | ✅ Completed |
-| Metric Labels | ✅ Completed |
-| PromQL Fundamentals | ✅ Completed |
-| Grafana Integration | ⏳ Next |
-| Dashboard Development | ⏳ Upcoming |
+| Labels & Time Series | ✅ Completed |
+| PromQL Queries | ✅ Completed |
+| Grafana Integration | ✅ Completed |
+| Dashboard Development | ✅ Completed |
+| Production Dashboard (4 Panels) | ✅ Completed |
 
 ---
 
 # Concepts Learned
 
-During this project, I explored:
+This project explores the core concepts behind modern application observability:
 
-- How Prometheus follows a pull-based metrics collection model.
-- How applications expose metrics through HTTP endpoints.
-- The difference between Counters, Gauges, and Histograms.
-- How labels create separate metric time series.
-- Why poor label design can create high-cardinality problems.
-- How Histograms help analyze application latency.
-- How PromQL converts raw metrics into useful operational insights.
-- How runtime metrics and custom application metrics work together.
+- Prometheus pull-based architecture
+- Application instrumentation
+- Counter, Gauge, and Histogram metrics
+- Runtime metrics
+- Labels and time-series design
+- High-cardinality considerations
+- PromQL querying
+- Dashboard design principles
+- Monitoring best practices
 
 ---
 
 # Documentation
 
-Each implementation phase is documented separately with both theory and practical implementation details.
+Each implementation phase is documented separately.
 
-| File | Topic |
-|---|---|
-| `01-prometheus-basics.md` | Prometheus architecture, scraping, and metrics |
-| `02-counter.md` | Counter metrics and request tracking |
-| `03-gauge.md` | Gauge metrics and current system state |
-| `04-histogram.md` | Latency measurement using Histograms |
-| `05-labels.md` | Labels, dimensions, and cardinality |
-| `06-promql.md` | PromQL queries and metric analysis |
+| File | Description |
+|------|-------------|
+| 01-prometheus-basics.md | Prometheus architecture and setup |
+| 02-counter.md | Counter metrics |
+| 03-gauge.md | Gauge metrics |
+| 04-histogram.md | Histogram metrics |
+| 05-labels.md | Labels and cardinality |
+| 06-promql.md | PromQL fundamentals |
 
 ---
 
-# Development Approach
+# Development Workflow
 
-Each observability feature follows a practical engineering workflow:
+Each feature follows a practical engineering workflow:
 
 1. Identify a monitoring requirement.
-2. Choose the correct metric type.
-3. Design useful labels.
-4. Instrument the application.
-5. Verify generated metrics.
-6. Analyze data using PromQL.
-7. Visualize results using Grafana.
-
-The focus is not only learning Prometheus syntax, but understanding how monitoring decisions are made in real production systems.
-
----
-
-# Next Steps
-
-The upcoming phase focuses on visualization and deeper monitoring workflows.
-
-Planned improvements:
-
-- Grafana setup and configuration
-- Connecting Grafana with Prometheus
-- Building application dashboards
-- Request traffic visualization
-- Latency monitoring dashboards
-- CPU and memory monitoring
-- Dashboard variables
-- Production-style observability dashboards
+2. Select the appropriate metric type.
+3. Instrument the application.
+4. Verify metric exposure.
+5. Configure Prometheus scraping.
+6. Query metrics using PromQL.
+7. Visualize operational insights with Grafana.
 
 ---
 
 # Project Status
 
-**Status:** Active Development
+**Status:** ✅ Completed
 
-## Completed
+### Completed
 
-✅ Prometheus Fundamentals  
-✅ Application Metric Instrumentation  
-✅ Custom Metrics  
-✅ Labels & Time Series  
-✅ PromQL Basics  
+- Prometheus integration
+- Metrics endpoint
+- Application instrumentation
+- Counter metrics
+- Gauge metrics
+- Histogram metrics
+- Labels & time-series design
+- PromQL queries
+- Grafana dashboard with four operational panels
+- Project documentation
 
-## Currently Working On
+---
 
-    Grafana Integration  
-    Dashboard Development  
-    Advanced Observability Concepts  
+# Future Improvements
+
+Potential enhancements include:
+
+- Grafana Alerting
+- Alertmanager integration
+- Notification channels (Email, Slack, Discord)
+- Dashboard variables
+- 95th percentile latency panel
+- Node.js Event Loop Lag monitoring
+- Multi-instance monitoring
+- Docker Compose deployment
+- Kubernetes deployment
 
 ---
 
